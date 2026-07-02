@@ -17,8 +17,9 @@ MainComponent::MainComponent() {
     }
 
     // Set gain slider style
-    gainSlider.setRange(0.0, 5.0);
-    gainSlider.setValue(1.5f);
+    gainSlider.setRange(0.0, 10.0);
+    gainSlider.setValue(3.0);
+    gainSlider.setSkewFactorFromMidPoint(3.0);
     gainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 20);
     // Reflect slider value to gain value

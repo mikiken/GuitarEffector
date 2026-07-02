@@ -27,7 +27,7 @@ class MainComponent : public juce::AudioAppComponent {
     //==============================================================================
     // Slider for editing gain
     juce::Slider gainSlider;
-    std::atomic<float> gain = 1.5f;
+    std::atomic<float> gain = 3.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
