@@ -51,5 +51,5 @@ xcuserdata/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 ### JUCE ###
-Builds/
-JuceLibraryCode/
+Build/
+**/JuceLibraryCode/

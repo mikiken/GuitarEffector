@@ -1,0 +1,8 @@
+{
+    "cmake.configureOnOpen": true,
+    "cmake.buildDirectory": "${workspaceFolder}/Build",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/Build/compile_commands.json",
+    "files.associations": {
+        "JuceHeader.h": "cpp"
+    }
+}
