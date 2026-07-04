@@ -8,26 +8,26 @@
     your controls and content.
 */
 class MainComponent : public juce::AudioAppComponent {
-  public:
-    //==============================================================================
-    MainComponent();
-    ~MainComponent() override;
+public:
+  //==============================================================================
+  MainComponent();
+  ~MainComponent() override;
 
-    //==============================================================================
-    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
-    void getNextAudioBlock(
-        const juce::AudioSourceChannelInfo &bufferToFill) override;
-    void releaseResources() override;
+  //==============================================================================
+  void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
+  void
+  getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) override;
+  void releaseResources() override;
 
-    //==============================================================================
-    void paint(juce::Graphics &g) override;
-    void resized() override;
+  //==============================================================================
+  void paint(juce::Graphics &g) override;
+  void resized() override;
 
-  private:
-    //==============================================================================
-    // Slider for editing gain
-    juce::Slider gainSlider;
-    std::atomic<float> gain = 3.0f;
+private:
+  //==============================================================================
+  // Slider for editing gain
+  juce::Slider gainSlider;
+  std::atomic<float> gain = 3.0f;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
