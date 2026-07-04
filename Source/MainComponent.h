@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EffectBlock/EffectBlock.h"
 #include <JuceHeader.h>
 
 //==============================================================================
@@ -25,9 +26,11 @@ public:
 
 private:
   //==============================================================================
-  // Slider for editing gain
-  juce::Slider gainSlider;
-  std::atomic<float> gain = 3.0f;
+  // List of effects to store in order
+  std::vector<std::unique_ptr<EffectBlock>> effectChain;
+
+  // List of GUI editors for each effect in the chain
+  std::vector<std::unique_ptr<juce::Component>> effectEditors;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

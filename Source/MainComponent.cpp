@@ -1,4 +1,5 @@
 #include "MainComponent.h"
+#include "EffectBlock/GainBlock.h"
 
 //==============================================================================
 MainComponent::MainComponent() {
@@ -16,15 +17,15 @@ MainComponent::MainComponent() {
     setAudioChannels(2, 2);
   }
 
-  // Set gain slider style
-  gainSlider.setRange(0.0, 10.0);
-  gainSlider.setValue(3.0);
-  gainSlider.setSkewFactorFromMidPoint(3.0);
-  gainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-  gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 20);
-  // Reflect slider value to gain value
-  gainSlider.onValueChange = [this] { gain = gainSlider.getValue(); };
-  addAndMakeVisible(gainSlider);
+  // Push GainBlock to effect chain.
+  effectChain.push_back(std::make_unique<GainBlock>());
+
+  // Create and add GUI editors for each effect in the chain
+  for (auto &effect : effectChain) {
+    auto editor = effect->createEditor();
+    addAndMakeVisible(editor.get());
+    effectEditors.push_back(std::move(editor));
+  }
 
   // Make sure you set the size of the component after
   // you add any child components.
@@ -51,18 +52,11 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected,
 
 void MainComponent::getNextAudioBlock(
     const juce::AudioSourceChannelInfo &bufferToFill) {
-  // Iterate through all channels in the buffer (e.g., L/R)
-  for (int channel = 0; channel < bufferToFill.buffer->getNumChannels();
-       ++channel) {
-    // Get the pointer to the buffer
-    float *channelData =
-        bufferToFill.buffer->getWritePointer(channel, bufferToFill.startSample);
-
-    // Iterate thorugh each sample in the buffer
-    for (int sample = 0; sample < bufferToFill.numSamples; ++sample) {
-      // Multiply the original amplitude by gain
-      channelData[sample] *= gain;
-    }
+  // Get a pointer to the target buffer.
+  juce::AudioBuffer<float> *buffer = bufferToFill.buffer;
+  // Apply each effect to the target buffer.
+  for (auto &effect : effectChain) {
+    effect->process(*buffer);
   }
 }
 
@@ -84,8 +78,12 @@ void MainComponent::paint(juce::Graphics &g) {
 }
 
 void MainComponent::resized() {
-  // This is called when the MainContentComponent is resized.
-  // If you add any child components, this is where you should
-  // update their positions.
-  gainSlider.setBounds(100, 100, 150, 150);
+  // Layout effect editors horizontally (pedalboard style)
+  auto area = getLocalBounds().reduced(20);
+  const int pedalWidth = 160;
+
+  for (auto &editor : effectEditors) {
+    editor->setBounds(area.removeFromLeft(pedalWidth));
+    area.removeFromLeft(10); // spacing between pedals
+  }
 }

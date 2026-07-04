@@ -21,6 +21,8 @@ target_sources(GuitarEffector PRIVATE
     Source/Main.cpp
     Source/MainComponent.cpp
     Source/MainComponent.h
+    Source/EffectBlock/EffectBlock.h
+    Source/EffectBlock/GainBlock.h
 )
 
 # Link JUCE libraries
