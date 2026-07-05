@@ -1,5 +1,6 @@
 #include "MainComponent.h"
 #include "EffectBlock/GainBlock.h"
+#include "EffectBlock/OverDriveBlock.h"
 
 //==============================================================================
 MainComponent::MainComponent() {
@@ -17,8 +18,9 @@ MainComponent::MainComponent() {
     setAudioChannels(2, 2);
   }
 
-  // Push GainBlock to effect chain.
-  effectChain.push_back(std::make_unique<GainBlock>());
+  // Push OverDriveBlock to effect chain.
+  // effectChain.push_back(std::make_unique<GainBlock>());
+  effectChain.push_back(std::make_unique<OverDriveBlock>());
 
   // Create and add GUI editors for each effect in the chain
   for (auto &effect : effectChain) {
@@ -60,16 +62,11 @@ MainComponent::~MainComponent() {
 }
 
 //==============================================================================
-void MainComponent::prepareToPlay(int samplesPerBlockExpected,
+void MainComponent::prepareToPlay(int /*samplesPerBlockExpected*/,
                                   double sampleRate) {
-  // This function will be called when the audio device is started, or when
-  // its settings (i.e. sample rate, block size, etc) are changed.
-
-  // You can use this function to initialise any resources you might need,
-  // but be careful - it will be called on the audio thread, not the GUI
-  // thread.
-
-  // For more details, see the help for AudioProcessor::prepareToPlay()
+  for (auto &effect : effectChain) {
+    effect->prepareToPlay(sampleRate);
+  }
 }
 
 void MainComponent::getNextAudioBlock(

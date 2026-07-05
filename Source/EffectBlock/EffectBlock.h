@@ -6,6 +6,9 @@ class EffectBlock {
 public:
   virtual ~EffectBlock() = default;
 
+  // Initialize audio processing (e.g. sample rate dependent filters)
+  virtual void prepareToPlay(double /*sampleRate*/) {}
+
   // Audio processing interface
   virtual void process(juce::AudioBuffer<float> &buffer) = 0;
 
