@@ -27,6 +27,28 @@ MainComponent::MainComponent() {
     effectEditors.push_back(std::move(editor));
   }
 
+  // Handling the Settings button click event
+  // (pops up JUCE's standard settings dialog)
+  settingsButton.onClick = [this] {
+    juce::DialogWindow::LaunchOptions options;
+
+    // deviceManager is the management variable held by AudioAppComponent behind
+    // the scenes
+    auto *selector = new juce::AudioDeviceSelectorComponent(
+        deviceManager, 0, 256, // Min. to Max. Input Channels
+        0, 256,                // Min. to Max. Output Channels
+        false, false, true, false);
+    selector->setSize(500, 270);
+
+    options.content.setOwned(selector);
+    options.dialogTitle = "Audio Settings";
+    options.dialogBackgroundColour =
+        getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId);
+    options.launchAsync();
+  };
+
+  addAndMakeVisible(settingsButton);
+
   // Make sure you set the size of the component after
   // you add any child components.
   setSize(800, 600);
@@ -78,6 +100,8 @@ void MainComponent::paint(juce::Graphics &g) {
 }
 
 void MainComponent::resized() {
+  // Specify the display area for the settings button
+  settingsButton.setBounds(10, 10, 120, 30);
   // Layout effect editors horizontally (pedalboard style)
   auto area = getLocalBounds().reduced(20);
   const int pedalWidth = 160;

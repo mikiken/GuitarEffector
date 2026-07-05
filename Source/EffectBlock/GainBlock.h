@@ -26,7 +26,7 @@ public:
 
   void resized() override {
     auto area = getLocalBounds();
-    titleLabel.setBounds(area.removeFromTop(24));
+    titleLabel.setBounds(area.removeFromTop(100));
     gainSlider.setBounds(area);
   }
 

@@ -26,6 +26,9 @@ public:
 
 private:
   //==============================================================================
+  // Button to audio settings screen
+  juce::TextButton settingsButton{"Audio Settings"};
+
   // List of effects to store in order
   std::vector<std::unique_ptr<EffectBlock>> effectChain;
 
