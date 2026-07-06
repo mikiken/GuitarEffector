@@ -62,10 +62,10 @@ MainComponent::~MainComponent() {
 }
 
 //==============================================================================
-void MainComponent::prepareToPlay(int /*samplesPerBlockExpected*/,
+void MainComponent::prepareToPlay(int samplesPerBlockExpected,
                                   double sampleRate) {
   for (auto &effect : effectChain) {
-    effect->prepareToPlay(sampleRate);
+    effect->prepareToPlay(sampleRate, samplesPerBlockExpected);
   }
 }
 
