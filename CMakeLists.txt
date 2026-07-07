@@ -23,6 +23,7 @@ target_sources(GuitarEffector PRIVATE
     Source/MainComponent.h
     Source/EffectBlock/EffectBlock.h
     Source/EffectBlock/GainBlock.h
+    Source/EffectBlock/OverDriveBlock.h
 )
 
 # Link JUCE libraries
@@ -34,6 +35,7 @@ target_link_libraries(GuitarEffector PRIVATE
     juce::juce_audio_utils
     juce::juce_core
     juce::juce_data_structures
+    juce::juce_dsp
     juce::juce_events
     juce::juce_graphics
     juce::juce_gui_basics
