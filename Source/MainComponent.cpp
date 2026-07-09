@@ -1,6 +1,7 @@
 #include "MainComponent.h"
 #include "EffectBlock/GainBlock.h"
 #include "EffectBlock/OverDriveBlock.h"
+#include "EffectBlock/ReverbBlock.h"
 
 //==============================================================================
 MainComponent::MainComponent() {
@@ -18,9 +19,10 @@ MainComponent::MainComponent() {
     setAudioChannels(2, 2);
   }
 
-  // Push OverDriveBlock to effect chain.
+  // Push EffectBlocks to effect chain.
   // effectChain.push_back(std::make_unique<GainBlock>());
   effectChain.push_back(std::make_unique<OverDriveBlock>());
+  effectChain.push_back(std::make_unique<ReverbBlock>());
 
   // Create and add GUI editors for each effect in the chain
   for (auto &effect : effectChain) {
