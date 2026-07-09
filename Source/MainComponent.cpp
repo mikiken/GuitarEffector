@@ -1,6 +1,7 @@
 #include "MainComponent.h"
 #include "EffectBlock/GainBlock.h"
 #include "EffectBlock/OverDriveBlock.h"
+#include "EffectBlock/ReverbBlock.h"
 
 //==============================================================================
 MainComponent::MainComponent() {
@@ -18,9 +19,10 @@ MainComponent::MainComponent() {
     setAudioChannels(2, 2);
   }
 
-  // Push OverDriveBlock to effect chain.
+  // Push EffectBlocks to effect chain.
   // effectChain.push_back(std::make_unique<GainBlock>());
   effectChain.push_back(std::make_unique<OverDriveBlock>());
+  effectChain.push_back(std::make_unique<ReverbBlock>());
 
   // Create and add GUI editors for each effect in the chain
   for (auto &effect : effectChain) {
@@ -51,6 +53,22 @@ MainComponent::MainComponent() {
 
   addAndMakeVisible(settingsButton);
 
+  // Mode selection setup
+  modeLabel.setText("Output Mode:", juce::dontSendNotification);
+  modeLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+  addAndMakeVisible(modeLabel);
+
+  modeSelector.addItem("Stereo Mode", 1);
+  modeSelector.addItem("Mono Mode", 2);
+  modeSelector.setSelectedId(1, juce::dontSendNotification);
+  modeSelector.onChange = [this] {
+    if (modeSelector.getSelectedId() == 1)
+      currentOutputMode.store(OutputMode::stereo);
+    else
+      currentOutputMode.store(OutputMode::mono);
+  };
+  addAndMakeVisible(modeSelector);
+
   // Make sure you set the size of the component after
   // you add any child components.
   setSize(800, 600);
@@ -71,11 +89,45 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected,
 
 void MainComponent::getNextAudioBlock(
     const juce::AudioSourceChannelInfo &bufferToFill) {
-  // Get a pointer to the target buffer.
-  juce::AudioBuffer<float> *buffer = bufferToFill.buffer;
-  // Apply each effect to the target buffer.
-  for (auto &effect : effectChain) {
-    effect->process(*buffer);
+  // Get a pointer to the target buffer and create a sub-buffer proxy
+  // representing only the active audio block range.
+  juce::AudioBuffer<float> proxyBuffer(
+      bufferToFill.buffer->getArrayOfWritePointers(),
+      bufferToFill.buffer->getNumChannels(), bufferToFill.startSample,
+      bufferToFill.numSamples);
+
+  const int numChannels = proxyBuffer.getNumChannels();
+  const int numSamples = proxyBuffer.getNumSamples();
+
+  if (currentOutputMode.load() == OutputMode::stereo) {
+    // Stereo mode: Copy Left channel (0) to Right channel (1) before applying
+    // effects
+    if (numChannels >= 2) {
+      proxyBuffer.copyFrom(1, 0, proxyBuffer.getReadPointer(0), numSamples);
+    }
+    for (auto &effect : effectChain) {
+      effect->process(proxyBuffer);
+    }
+  } else {
+    // Mono mode: Clear right channel before effects, run effects on mono buffer
+    // wrapper, and clear right channel after
+    if (numChannels >= 2) {
+      for (int ch = 1; ch < numChannels; ++ch) {
+        proxyBuffer.clear(ch, 0, numSamples);
+      }
+    }
+
+    juce::AudioBuffer<float> monoBuffer(proxyBuffer.getArrayOfWritePointers(),
+                                        1, numSamples);
+    for (auto &effect : effectChain) {
+      effect->process(monoBuffer);
+    }
+
+    if (numChannels >= 2) {
+      for (int ch = 1; ch < numChannels; ++ch) {
+        proxyBuffer.clear(ch, 0, numSamples);
+      }
+    }
   }
 }
 
@@ -97,10 +149,14 @@ void MainComponent::paint(juce::Graphics &g) {
 }
 
 void MainComponent::resized() {
-  // Specify the display area for the settings button
-  settingsButton.setBounds(10, 10, 120, 30);
+  // Specify the display area for the settings button and mode selector
+  settingsButton.setBounds(10, 10, 130, 30);
+  modeLabel.setBounds(155, 10, 90, 30);
+  modeSelector.setBounds(250, 10, 140, 30);
+
   // Layout effect editors horizontally (pedalboard style)
   auto area = getLocalBounds().reduced(20);
+  area.removeFromTop(40); // Leave space for top controls
   const int pedalWidth = 160;
 
   for (auto &editor : effectEditors) {
