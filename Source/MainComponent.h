@@ -2,6 +2,7 @@
 
 #include "EffectBlock/EffectBlock.h"
 #include <JuceHeader.h>
+#include <atomic>
 
 //==============================================================================
 /*
@@ -34,6 +35,12 @@ private:
 
   // List of GUI editors for each effect in the chain
   std::vector<std::unique_ptr<juce::Component>> effectEditors;
+
+  enum class OutputMode { stereo, mono };
+  std::atomic<OutputMode> currentOutputMode{OutputMode::stereo};
+
+  juce::Label modeLabel;
+  juce::ComboBox modeSelector;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
